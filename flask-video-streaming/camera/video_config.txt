@@ -1,0 +1,4 @@
+w = 640,h = 480
+IP is 10.98.4.172:7999
+Save pic flag:0
+image's quality is:15,range(0~95)

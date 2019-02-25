@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人脸识别监控</title>
+    <link rel="stylesheet" href="/static/css/center.css" />
+    <script src="/static/js/jquery-3.3.1.min.js"></script>
+    <style>
+        body {
+            /* 加载背景图 */
+            background-image: url("/static/img/night-star.png");
+
+            /* 背景图垂直、水平均居中 */
+            background-position: center center;
+
+            /* 背景图不平铺 */
+            background-repeat: no-repeat;
+
+            /* 当内容高度大于图片高度时，背景图像的位置相对于viewport固定 */
+            background-attachment: fixed;
+
+            /* 让背景图基于容器大小伸缩 */
+            background-size: cover;
+
+            /* 设置背景颜色，背景图加载过程中会显示背景色 */
+            background-color: #464646;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-in-center">
+        <div class="center-left">
+            <iframe src="/static/html/time.html" width="100%" height="100%" frameborder="0">
+                您的浏览器不支持iframe，请升级
+            </iframe>
+        </div>
+        <div class="center-right">
+            <img  src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+
+    <div class="pop-div" id="notify">
+            <div class="pop-div-top">
+                <img class="pop-img" id="notify-img" src="/static/img/1.jpg">
+            </div>
+            <div id="popbottom" class="pop-div-bottom">zhangchaolin</div>
+    </div>
+
+
+    <script>
+        var socket = new WebSocket("ws://10.98.4.172:9000");
+
+        socket.onopen = function () {
+            /* 与服务器端连接成功后，自动执行 */
+
+            var newTag = document.createElement('div');
+            newTag.innerHTML = "【连接成功】";
+        };
+
+        socket.onmessage = function (event) {
+            /* 服务器端向客户端发送数据时，自动执行 */
+            var img = document.getElementById("notify-img");
+            img.src = event.data;
+            /* 设置名字 */
+            var last_index_slash = event.data.lastIndexOf("/");
+            var last_index_dot = event.data.lastIndexOf(".");
+            var name = event.data.substring(last_index_slash+1, last_index_dot)
+            document.getElementById("popbottom").innerHTML = name
+            popDiv()
+        };
+
+        socket.onclose = function closeConn() {
+            socket.close();
+        };
+
+        $(document).ready(function(){
+            $("button").click(function(){
+                popDiv()
+            });
+
+        });
+        function popDiv(){
+            $("#notify").fadeIn('fast')
+            // $("#div1").fadeOut(3000);
+            $("#notify").animate(
+                {
+                    width: '300px',
+                    height: '350px'
+                },
+                200
+            )
+            setTimeout(
+                function () {
+
+
+                    //$("#div1").fadeOut(2000);
+                    $("#notify").animate(
+                        {
+                            width: '0px',
+                            height: '0px'
+                        },
+                        300
+                    )
+                    $("#notify").fadeOut();
+                },2000
+            )
+        };
+    </script>
+</body>
+</html>

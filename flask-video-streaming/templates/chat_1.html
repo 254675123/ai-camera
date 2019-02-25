@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>w</title>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <title></title>
+</head>
+<body>
+    <div>
+        <input type="text" id="txt"/>
+        <input type="button" id="btn" value="提交" onclick="sendMsg();"/>
+        <input type="button" id="close" value="关闭连接" onclick="closeConn();"/>
+    </div>
+    <div id="content"></div>
+
+<script type="text/javascript">
+    var socket = new WebSocket("ws://127.0.0.1:8080");
+
+    socket.onopen = function () {
+        /* 与服务器端连接成功后，自动执行 */
+
+        var newTag = document.createElement('div');
+        newTag.innerHTML = "【连接成功】";
+        document.getElementById('content').appendChild(newTag);
+    };
+
+    socket.onmessage = function (event) {
+        /* 服务器端向客户端发送数据时，自动执行 */
+        var response = event.data;
+        var newTag = document.createElement('div');
+        newTag.innerHTML = response;
+        document.getElementById('content').appendChild(newTag);
+    };
+
+    socket.onclose = function (event) {
+        /* 服务器端主动断开连接时，自动执行 */
+        var newTag = document.createElement('div');
+        newTag.innerHTML = "【关闭连接】";
+        document.getElementById('content').appendChild(newTag);
+    };
+
+    function sendMsg() {
+        var txt = document.getElementById('txt');
+        socket.send(txt.value);
+        txt.value = "";
+    }
+    function closeConn() {
+        socket.close();
+        var newTag = document.createElement('div');
+        newTag.innerHTML = "【关闭连接】";
+        document.getElementById('content').appendChild(newTag);
+    }
+
+</script>
+</body>
+</html>

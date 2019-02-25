@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人脸识别监控</title>
+    <link rel="stylesheet" href="static/css/center.css" />
+</head>
+<body>
+    <div class="center-in-center">
+        <div class="center-left">天天</div>
+        <div class="center-right">
+            <img  src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+    <div >
+        <img id="notify" src="/static/img/1.jpg">
+        <p id="content"></p>
+    </div>
+
+<script type="text/javascript">
+    var socket = new WebSocket("ws://127.0.0.1:9000");
+
+    socket.onopen = function () {
+        /* 与服务器端连接成功后，自动执行 */
+
+        var newTag = document.createElement('div');
+        newTag.innerHTML = "【连接成功】";
+    };
+
+    socket.onmessage = function (event) {
+        /* 服务器端向客户端发送数据时，自动执行 */
+        var img = document.getElementById("notify")
+        img.src = event.data
+    };
+
+    function sendMsg() {
+    };
+    function closeConn() {
+        socket.close();
+    };
+
+    function popDiv(){
+
+    };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        #app {
+            font-family: 'Avenir', Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-align: center;
+            color: #2c3e50;
+        }
+        div.showImage{
+            width: 800px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        div.showImage::after{
+            content: '';
+            display: block;
+            clear: both;
+        }
+        div.showImage > button{
+            margin-top: 280px;
+        }
+        #img1{
+            width: 350px;
+            height: 600px;
+            float: left;
+        }
+        #img2{
+            width: 350px;
+            height: 600px;
+            float: right;
+        }
+        #faceform{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <form id="faceform" action="https://api-cn.faceplusplus.com/facepp/v3/compare" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+          <input type="file" name="image_file1" @change="getFile1">
+          <input type="file" name="image_file2" @change="getFile2">
+        </form>
+        <div class="showImage">
+          <img id="img1" :src="src1" hidden>
+          <button @click="submit">比较</button>
+          <img id="img2" :src="src2" hidden>
+        </div>
+        <span id="showconfidence"></span>
+      </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_65682a2.js"></script>
+<script>
+var app = new Vue({
+  el: '#app',
+  data:{
+      src1: '',
+      src2: '',
+      file1: null,
+      file2: null,
+      confidence:false
+  },
+  methods:{
+    submit:function(){
+        var self = this
+        $('#showconfidence').text('正在计算中。。。')
+        $.ajax({
+            url: 'compare/',
+            type: 'POST',
+            cache: false,
+            data: new FormData($('#faceform')[0]),
+            processData: false,
+            contentType: false
+        }).done(function(res) {
+            $('#showconfidence').text('相似度：'+res.confidence)
+        }).fail(function(res) {
+            console.log(res)
+        });
+    },
+    getFile1:function($event){
+      this.file1 = $event.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(this.file1);
+      var app = this;
+      reader.onloadend=function() {
+          app.src1 = this.result;
+          $('#img1').attr('hidden',false)
+      };
+    },
+    getFile2:function($event){
+      this.file2 = $event.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(this.file2);
+      var app = this;
+      reader.onloadend=function() {
+          app.src2 = this.result;
+          $('#img2').attr('hidden',false)
+      };
+    }
+  }
+})
+</script>
+</html>
